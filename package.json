@@ -1,6 +1,6 @@
 {
   "name": "react-data-cache",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "author": "Alican Erdogan",
   "license": "MIT",
   "repository": {
@@ -10,6 +10,7 @@
   "main": "dist/react-data-cache.cjs.js",
   "module": "dist/react-data-cache.esm.js",
   "browser": "dist/react-data-cache.umd.js",
+  "types": "types/index.d.ts",
   "devDependencies": {
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
