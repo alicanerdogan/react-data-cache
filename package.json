@@ -10,15 +10,15 @@
   "main": "dist/react-data-cache.cjs.js",
   "module": "dist/react-data-cache.esm.js",
   "browser": "dist/react-data-cache.umd.js",
-  "types": "types/index.d.ts",
+  "types": "dist/main.d.ts",
   "devDependencies": {
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
     "rollup": "^1.0.0",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^4.0.0",
-    "rollup-plugin-typescript": "^1.0.0",
-    "ts-node": "^7.0.1",
+    "rollup-plugin-typescript2": "^0.19.2",
+    "ts-node": "^8.0.2",
     "tslib": "^1.9.3",
     "typescript": "^3.2.2"
   },
@@ -28,11 +28,10 @@
     "pretest": "npm run build"
   },
   "files": [
-    "dist",
-    "types"
+    "dist"
   ],
   "peerDependencies": {
-    "react": "^16.8.0-alpha.1",
-    "react-dom": "^16.8.0-alpha.1"
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1"
   }
 }
