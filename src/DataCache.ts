@@ -3,18 +3,24 @@ import React from "react";
 export type Key = string | number;
 export type FetchArgs = [RequestInfo, RequestInit | undefined];
 export type GetKey = (input: RequestInfo, init?: RequestInit) => Key;
-export type Invalidate = (input: RequestInfo, init?: RequestInit) => boolean;
-export interface IResponseState {
-  isLoading: boolean;
-  response?: IResponse;
-}
+
 export interface IResponse {
   status: number;
   data: string;
 }
+
+export interface IResponseState {
+  isLoading: boolean;
+  response?: IResponse;
+}
+
+export interface IResponseStateProps extends IResponseState {
+  trigger: () => void;
+}
+
 export interface IParsedResponse {
   status: number;
-  data?: { [key: string]: unknown };
+  data?: any;
 }
 
 type Listener = (state: IResponseState) => void;
@@ -83,35 +89,32 @@ function getDefaultKey(input: RequestInfo, init?: RequestInit) {
   return `${method} ${input}`;
 }
 
-function invalidateDefault() {
-  return false;
-}
-
 export function useDataCache({
   fetchArgs,
   getKey,
-  invalidate,
   suspend
 }: {
   fetchArgs: FetchArgs;
   getKey?: GetKey;
-  invalidate?: Invalidate;
   suspend?: boolean;
-}) {
+}): IResponseStateProps {
   const cacheStore = React.useContext(CacheContext);
 
   const getKeyFn = getKey || getDefaultKey;
   const key = getKeyFn(...fetchArgs);
 
-  const invalidateFn = invalidate || invalidateDefault;
-  const invalidated = invalidateFn(...fetchArgs);
-
-  const [entryCache, setEntryCache] = React.useState(
-    cacheStore.getState()[key]
-  );
+  const [entryCache, setEntryCache] = React.useState(() => {
+    if (cacheStore.getState()[key]) {
+      return cacheStore.getState()[key];
+    }
+    return { isLoading: !suspend };
+  });
 
   const listener = React.useCallback(
-    keyEntry => {
+    (keyEntry: IResponseState) => {
+      if (keyEntry.isLoading && (entryCache || {}).isLoading) {
+        return;
+      }
       setEntryCache(keyEntry);
     },
     [setEntryCache]
@@ -121,18 +124,18 @@ export function useDataCache({
     cacheStore.subscribe(key, listener);
   }, [cacheStore, key, listener]);
 
+  const trigger = React.useCallback(() => {
+    cacheStore.dispatch(fetchArgs, key);
+  }, [cacheStore, fetchArgs, key]);
+
   React.useEffect(() => {
-    if ((!invalidated && entryCache) || suspend) {
+    if (entryCache.response || suspend) {
       return;
     }
-    cacheStore.dispatch(fetchArgs, key);
-  }, [cacheStore, entryCache, fetchArgs, key, invalidated, suspend]);
+    trigger();
+  }, [entryCache, suspend, trigger]);
 
-  return invalidated || !entryCache
-    ? suspend
-      ? { isLoading: false }
-      : { isLoading: true }
-    : entryCache;
+  return { ...entryCache, trigger };
 }
 
 export function parseResponse(

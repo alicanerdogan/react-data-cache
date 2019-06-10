@@ -2,25 +2,45 @@ import * as React from "react";
 
 import { useDataCache } from "../src/DataCache";
 
-export interface IListReposProps {}
+export interface IListReposProps {
+  suspend?: boolean;
+}
 
-export const ListRepos: React.SFC<IListReposProps> = (
-  props: IListReposProps
-) => {
+export const ListRepos: React.SFC<IListReposProps> = ({
+  suspend
+}: IListReposProps) => {
   const dataStatus = useDataCache({
-    fetchArgs: ["https://api.github.com/users/octocat/orgs", { method: "GET" }]
+    fetchArgs: ["https://api.github.com/users/octocat/orgs", { method: "GET" }],
+    suspend: suspend
   });
 
+  const renderCountRef = React.useRef(0);
+  renderCountRef.current += 1;
+
   if (dataStatus.isLoading) {
-    return <p>{"Loading Placeholder"}</p>;
+    return (
+      <div>
+        <p data-testid="render-count">{renderCountRef.current}</p>
+        <p data-testid="loading">{"Loading Placeholder"}</p>
+      </div>
+    );
   }
 
-  if (!dataStatus.response) {
-    return <p>{"Error Occured"}</p>;
+  if (!dataStatus.isLoading && !dataStatus.response) {
+    return (
+      <div>
+        <p data-testid="render-count">{renderCountRef.current}</p>
+        <p data-testid="suspended">{"Suspended"}</p>
+        <button data-testid="trigger" onClick={dataStatus.trigger}>
+          {"Trigger"}
+        </button>
+      </div>
+    );
   }
 
   return (
-    <div data-testid="content">
+    <div>
+      <p data-testid="render-count">{renderCountRef.current}</p>
       <div>
         <label>{"Status"}</label>
         <p data-testid="status">{dataStatus.response.status}</p>
