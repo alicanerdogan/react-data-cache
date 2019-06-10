@@ -18,9 +18,9 @@ export interface IResponseStateProps extends IResponseState {
   trigger: () => void;
 }
 
-export interface IParsedResponse {
+export interface IParsedResponse<T> {
   status: number;
-  data?: any;
+  data?: T;
 }
 
 type Listener = (state: IResponseState) => void;
@@ -138,14 +138,18 @@ export function useDataCache({
   return { ...entryCache, trigger };
 }
 
-export function parseResponse(
+export function parseResponse<T>(
   response?: IResponse
-): IParsedResponse | undefined {
+): IParsedResponse<T> | undefined {
   if (!response) {
     return undefined;
   }
   if (!response.data) {
     return { status: response.status };
   }
-  return { ...response, data: JSON.parse(response.data) };
+  try {
+    return { ...response, data: JSON.parse(response.data) as T };
+  } catch (error) {
+    return { status: response.status };
+  }
 }
