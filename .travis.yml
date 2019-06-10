@@ -1,6 +1,14 @@
 language: node_js
 node_js:
-  - '11'
-  - '10'
-  - '8'
-  - '6'
+  - "8"
+cache:
+  yarn: true
+install:
+  - yarn
+script:
+  - yarn test
+  - yarn build
+branches:
+  only:
+    - master
+    - /^v\d+\.\d+.*$/
