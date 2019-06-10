@@ -12,8 +12,21 @@
   "browser": "dist/react-data-cache.umd.js",
   "types": "dist/main.d.ts",
   "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-syntax-object-rest-spread": "^7.2.0",
+    "@babel/plugin-transform-async-to-generator": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
+    "@babel/runtime": "^7.4.5",
+    "@testing-library/react": "^8.0.1",
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
+    "babel-jest": "^24.8.0",
+    "jest": "^24.8.0",
+    "react": "16.9.0-alpha.0",
+    "react-dom": "16.9.0-alpha.0",
     "rollup": "^1.14.5",
     "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-node-resolve": "^5.0.1",
@@ -25,13 +38,10 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "pretest": "npm run build"
+    "test": "jest"
   },
   "files": [
     "dist"
   ],
-  "peerDependencies": {
-    "react": "^16.8.1",
-    "react-dom": "^16.8.1"
-  }
+  "peerDependencies": {}
 }

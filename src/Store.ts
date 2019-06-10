@@ -125,6 +125,7 @@ export function useDataCache({
     if ((!invalidated && entryCache) || suspend) {
       return;
     }
+    console.log("Dispatch", key, suspend);
     cacheStore.dispatch(fetchArgs, key);
   }, [cacheStore, entryCache, fetchArgs, key, invalidated, suspend]);
 
