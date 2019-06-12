@@ -4,17 +4,27 @@ export type Key = string | number;
 export type FetchArgs = [RequestInfo, RequestInit | undefined];
 export type GetKey = (input: RequestInfo, init?: RequestInit) => Key;
 
-export interface IResponse {
+export interface ITypedResponse<T> {
   status: number;
-  data: string;
+  data: T;
 }
+export interface IResponse extends ITypedResponse<string> {}
 
 export interface IResponseState {
   isLoading: boolean;
   response?: IResponse;
 }
 
+export interface ITypedResponseState<T> {
+  isLoading: boolean;
+  response?: ITypedResponse<T>;
+}
+
 export interface IResponseStateProps extends IResponseState {
+  trigger: () => void;
+}
+
+export interface ITypedResponseStateProps<T> extends ITypedResponseState<T> {
   trigger: () => void;
 }
 
@@ -58,6 +68,25 @@ class Store {
         keySubscribers.forEach(listener => listener(this.state[key]));
       })
     );
+  };
+
+  dispatchWithFn = (fetch: () => Promise<any>, key: Key) => {
+    this.state = { ...this.state, [key]: { isLoading: true } };
+    const keySubscribers = this.subscribers[key] || [];
+    keySubscribers.forEach(listener => listener(this.state[key]));
+
+    fetch().then(data => {
+      this.state = {
+        ...this.state,
+        [key]: {
+          isLoading: false,
+          response: data
+        }
+      };
+      devTools && devTools.send("UPDATE " + key, this.state);
+      const keySubscribers = this.subscribers[key] || [];
+      keySubscribers.forEach(listener => listener(this.state[key]));
+    });
   };
 
   getState() {
@@ -127,6 +156,54 @@ export function useDataCache({
   const trigger = React.useCallback(() => {
     cacheStore.dispatch(fetchArgs, key);
   }, [cacheStore, fetchArgs, key]);
+
+  React.useEffect(() => {
+    if (entryCache.response || suspend) {
+      return;
+    }
+    trigger();
+  }, [entryCache, suspend, trigger]);
+
+  return { ...entryCache, trigger };
+}
+
+export function useDataCacheWithFetch<T>({
+  fetch,
+  key,
+  suspend
+}: {
+  fetch: () => Promise<T>;
+  key: Key;
+  suspend?: boolean;
+}): ITypedResponseStateProps<T> {
+  const cacheStore = React.useContext(CacheContext);
+
+  const [entryCache, setEntryCache] = React.useState<ITypedResponseState<T>>(
+    () => {
+      if (cacheStore.getState()[key]) {
+        return cacheStore.getState()[key] as ITypedResponseState<T>;
+      }
+      return { isLoading: !suspend };
+    }
+  );
+
+  const listener = React.useCallback(
+    (keyEntry: IResponseState) => {
+      if (keyEntry.isLoading && (entryCache || {}).isLoading) {
+        return;
+      }
+      setEntryCache((keyEntry as unknown) as ITypedResponseState<T>);
+    },
+    [setEntryCache]
+  );
+
+  React.useEffect(() => {
+    cacheStore.subscribe(key, listener);
+  }, [cacheStore, key, listener]);
+
+  const trigger = React.useCallback(() => {
+    cacheStore.dispatchWithFn(fetch, key);
+  }, [cacheStore, fetch, key]);
 
   React.useEffect(() => {
     if (entryCache.response || suspend) {

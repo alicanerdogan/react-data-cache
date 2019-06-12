@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataCache } from "../src/DataCache";
+import { useDataCache } from "../../src/DataCache";
 
 export interface IListReposProps {
   suspend?: boolean;

@@ -6,7 +6,7 @@ import {
   fireEvent
 } from "@testing-library/react";
 
-import { TestApp } from "./TestApp";
+import { TestApp } from "../TestApp";
 import { ListRepos } from "./ListRepos";
 import { Project } from "./Project";
 

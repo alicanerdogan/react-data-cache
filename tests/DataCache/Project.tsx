@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataCache, parseResponse } from "../src/DataCache";
+import { useDataCache, parseResponse } from "../../src/DataCache";
 
 export interface IProjectProps {
   projectId: string;
