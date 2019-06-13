@@ -38,6 +38,10 @@ export const ListRepos: React.SFC<IListReposProps> = ({
     );
   }
 
+  const contentType = dataStatus.response.headers.find(([header, value]) => {
+    return header === "Content-Type";
+  })[1];
+
   return (
     <div>
       <p data-testid="render-count">{renderCountRef.current}</p>
@@ -48,6 +52,10 @@ export const ListRepos: React.SFC<IListReposProps> = ({
       <div>
         <label>{"Data"}</label>
         <p>{dataStatus.response.data}</p>
+      </div>
+      <div>
+        <label>{"Content Type"}</label>
+        <p data-testid="content-type">{contentType}</p>
       </div>
     </div>
   );

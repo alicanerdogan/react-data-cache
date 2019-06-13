@@ -10,12 +10,25 @@ import { TestApp } from "../TestApp";
 import { ListRepos } from "./ListRepos";
 import { Project } from "./Project";
 
+class Headers {
+  constructor(headers) {
+    this.headers = headers || [];
+  }
+
+  forEach(iterator) {
+    this.headers.forEach(([key, value]) => {
+      iterator(value, key, this);
+    });
+  }
+}
+
 describe("DataCache", () => {
   it("provides response", async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         status: 200,
-        text: () => Promise.resolve("Test")
+        text: () => Promise.resolve("Test"),
+        headers: new Headers([["Content-Type", "application/json"]])
       })
     );
 
@@ -36,7 +49,8 @@ describe("DataCache", () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         status: 200,
-        text: () => Promise.resolve("Test")
+        text: () => Promise.resolve("Test"),
+        headers: new Headers([["Content-Type", "application/json"]])
       })
     );
 
@@ -57,6 +71,9 @@ describe("DataCache", () => {
 
     const renderCount = getByTestId("render-count");
     expect(renderCount.innerHTML).toEqual("3");
+
+    const contentType = getByTestId("content-type");
+    expect(contentType.innerHTML).toEqual("application/json");
   });
 
   it("does not rerender other components uses hook when it fetches other key results", async () => {
@@ -68,7 +85,8 @@ describe("DataCache", () => {
             url.endsWith("1")
               ? JSON.stringify({ id: "1" })
               : JSON.stringify({ id: "2" })
-          )
+          ),
+        headers: new Headers([["Content-Type", "application/json"]])
       })
     );
 

@@ -4,21 +4,18 @@ export type Key = string | number;
 export type FetchArgs = [RequestInfo, RequestInit | undefined];
 export type GetKey = (input: RequestInfo, init?: RequestInit) => Key;
 
-export interface ITypedResponse<T> {
+export interface IResponse {
   status: number;
-  data: T;
-}
-export interface IResponse extends ITypedResponse<string> {}
-
-export interface IResponseState {
-  isLoading: boolean;
-  response?: IResponse;
+  data: string;
+  headers: [string, string][];
 }
 
 export interface ITypedResponseState<T> {
   isLoading: boolean;
-  response?: ITypedResponse<T>;
+  response?: T;
 }
+
+export interface IResponseState extends ITypedResponseState<IResponse> {}
 
 export interface IResponseStateProps extends IResponseState {
   trigger: () => void;
@@ -31,6 +28,16 @@ export interface ITypedResponseStateProps<T> extends ITypedResponseState<T> {
 export interface IParsedResponse<T> {
   status: number;
   data?: T;
+}
+
+function getHeaders(headers: Headers): [string, string][] {
+  const headerList: [string, string][] = [];
+
+  headers.forEach((value, key) => {
+    headerList.push([key, value]);
+  });
+
+  return headerList;
 }
 
 type Listener = (state: IResponseState) => void;
@@ -60,7 +67,11 @@ class Store {
           ...this.state,
           [key]: {
             isLoading: false,
-            response: { data, status: resp.status }
+            response: {
+              data,
+              status: resp.status,
+              headers: getHeaders(resp.headers)
+            }
           }
         };
         devTools && devTools.send("UPDATE " + key, this.state);

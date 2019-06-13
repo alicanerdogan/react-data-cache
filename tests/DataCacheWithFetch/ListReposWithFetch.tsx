@@ -4,7 +4,7 @@ import { useDataCacheWithFetch } from "../../src/DataCache";
 
 export interface IListReposWithFetchProps {
   suspend?: boolean;
-  fetch: () => Promise<{ status: number; data: string }>;
+  fetch: () => Promise<{ status: number; repos: { id: string }[] }>;
 }
 
 export const ListReposWithFetch: React.SFC<IListReposWithFetchProps> = ({
@@ -50,7 +50,7 @@ export const ListReposWithFetch: React.SFC<IListReposWithFetchProps> = ({
       </div>
       <div>
         <label>{"Data"}</label>
-        <p>{dataStatus.response.data}</p>
+        <p>{JSON.stringify(dataStatus.response.repos)}</p>
       </div>
     </div>
   );
