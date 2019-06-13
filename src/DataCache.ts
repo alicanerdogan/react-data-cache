@@ -28,6 +28,7 @@ export interface ITypedResponseStateProps<T> extends ITypedResponseState<T> {
 export interface IParsedResponse<T> {
   status: number;
   data?: T;
+  headers: [string, string][];
 }
 
 function getHeaders(headers: Headers): [string, string][] {
@@ -233,11 +234,11 @@ export function parseResponse<T>(
     return undefined;
   }
   if (!response.data) {
-    return { status: response.status };
+    return { status: response.status, headers: response.headers };
   }
   try {
     return { ...response, data: JSON.parse(response.data) as T };
   } catch (error) {
-    return { status: response.status };
+    return { status: response.status, headers: response.headers };
   }
 }
