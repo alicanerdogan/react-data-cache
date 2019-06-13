@@ -1,7 +1,7 @@
 import React from "react";
 
 export type Key = string | number;
-export type FetchArgs = [RequestInfo, RequestInit | undefined];
+export type FetchArgs = [RequestInfo] | [RequestInfo, RequestInit];
 export type GetKey = (input: RequestInfo, init?: RequestInit) => Key;
 
 export interface IResponse {
@@ -62,7 +62,10 @@ class Store {
     const keySubscribers = this.subscribers[key] || [];
     keySubscribers.forEach(listener => listener(this.state[key]));
 
-    fetch(...fetchArgs).then(resp =>
+    const input = fetchArgs[0];
+    const init = fetchArgs[1];
+
+    fetch(input, init).then(resp =>
       resp.text().then(data => {
         this.state = {
           ...this.state,
@@ -75,7 +78,7 @@ class Store {
             }
           }
         };
-        devTools && devTools.send("UPDATE " + key, this.state);
+        devTools && devTools.send(key, this.state);
         const keySubscribers = this.subscribers[key] || [];
         keySubscribers.forEach(listener => listener(this.state[key]));
       })
@@ -142,7 +145,7 @@ export function useDataCache({
   const cacheStore = React.useContext(CacheContext);
 
   const getKeyFn = getKey || getDefaultKey;
-  const key = getKeyFn(...fetchArgs);
+  const key = getKeyFn(fetchArgs[0], fetchArgs[1]);
 
   const [entryCache, setEntryCache] = React.useState(() => {
     if (cacheStore.getState()[key]) {
