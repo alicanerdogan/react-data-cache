@@ -147,21 +147,18 @@ export function useDataCache({
   const getKeyFn = getKey || getDefaultKey;
   const key = getKeyFn(fetchArgs[0], fetchArgs[1]);
 
-  const [entryCache, setEntryCache] = React.useState(() => {
-    if (cacheStore.getState()[key]) {
-      return cacheStore.getState()[key];
-    }
-    return { isLoading: !suspend };
-  });
+  const entryCache = cacheStore.getState()[key] || { isLoading: !suspend };
+
+  const [, setForceRender] = React.useState({});
 
   const listener = React.useCallback(
     (keyEntry: IResponseState) => {
       if (keyEntry.isLoading && (entryCache || {}).isLoading) {
         return;
       }
-      setEntryCache(keyEntry);
+      setForceRender({});
     },
-    [setEntryCache]
+    [setForceRender]
   );
 
   React.useEffect(() => {
@@ -193,23 +190,20 @@ export function useDataCacheWithFetch<T>({
 }): ITypedResponseStateProps<T> {
   const cacheStore = React.useContext(CacheContext);
 
-  const [entryCache, setEntryCache] = React.useState<ITypedResponseState<T>>(
-    () => {
-      if (cacheStore.getState()[key]) {
-        return cacheStore.getState()[key] as ITypedResponseState<T>;
-      }
-      return { isLoading: !suspend };
-    }
-  );
+  const entryCache: ITypedResponseState<T> = (cacheStore.getState()[
+    key
+  ] as ITypedResponseState<T>) || { isLoading: !suspend };
+
+  const [, setForceRender] = React.useState({});
 
   const listener = React.useCallback(
     (keyEntry: IResponseState) => {
       if (keyEntry.isLoading && (entryCache || {}).isLoading) {
         return;
       }
-      setEntryCache((keyEntry as unknown) as ITypedResponseState<T>);
+      setForceRender({});
     },
-    [setEntryCache]
+    [setForceRender]
   );
 
   React.useEffect(() => {
