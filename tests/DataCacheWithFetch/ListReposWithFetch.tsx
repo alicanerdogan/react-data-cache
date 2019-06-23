@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataCacheWithFetch } from "../../src/DataCache";
+import { useResolver } from "../../src/DataCache";
 
 export interface IListReposWithFetchProps {
   suspend?: boolean;
@@ -11,8 +11,8 @@ export const ListReposWithFetch: React.SFC<IListReposWithFetchProps> = ({
   suspend,
   fetch
 }: IListReposWithFetchProps) => {
-  const dataStatus = useDataCacheWithFetch({
-    fetch,
+  const dataStatus = useResolver({
+    resolver: fetch,
     key: `GET repos`,
     suspend
   });

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataCache } from "../../src/DataCache";
+import { useFetch } from "../../src/DataCache";
 
 export interface IListReposProps {
   suspend?: boolean;
@@ -9,7 +9,7 @@ export interface IListReposProps {
 export const ListRepos: React.SFC<IListReposProps> = ({
   suspend
 }: IListReposProps) => {
-  const dataStatus = useDataCache({
+  const dataStatus = useFetch({
     fetchArgs: ["https://api.github.com/users/octocat/orgs", { method: "GET" }],
     suspend: suspend
   });

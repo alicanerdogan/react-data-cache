@@ -133,7 +133,7 @@ function getDefaultKey(input: RequestInfo, init?: RequestInit) {
   return `${method} ${input}`;
 }
 
-export function useDataCache({
+export function useFetch({
   fetchArgs,
   getKey,
   suspend
@@ -179,12 +179,12 @@ export function useDataCache({
   return { ...entryCache, trigger };
 }
 
-export function useDataCacheWithFetch<T>({
-  fetch,
+export function useResolver<T>({
+  resolver,
   key,
   suspend
 }: {
-  fetch: () => Promise<T>;
+  resolver: () => Promise<T>;
   key: Key;
   suspend?: boolean;
 }): ITypedResponseStateProps<T> {
@@ -211,8 +211,8 @@ export function useDataCacheWithFetch<T>({
   }, [cacheStore, key, listener]);
 
   const trigger = React.useCallback(() => {
-    cacheStore.dispatchWithFn(fetch, key);
-  }, [cacheStore, fetch, key]);
+    cacheStore.dispatchWithFn(resolver, key);
+  }, [cacheStore, resolver, key]);
 
   React.useEffect(() => {
     if (entryCache.response || suspend) {

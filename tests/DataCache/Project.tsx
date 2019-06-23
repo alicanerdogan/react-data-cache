@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataCache, parseResponse } from "../../src/DataCache";
+import { useFetch, parseResponse } from "../../src/DataCache";
 
 export interface IProjectProps {
   projectId: string;
@@ -9,7 +9,7 @@ export interface IProjectProps {
 
 export const Project: React.SFC<IProjectProps> = React.memo(
   ({ suspend, projectId }: IProjectProps) => {
-    const dataStatus = useDataCache({
+    const dataStatus = useFetch({
       fetchArgs: [`https://api.github.com/projects/${projectId}`],
       suspend: suspend
     });

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { useDataCacheWithFetch } from "../../src/DataCache";
+import { useResolver } from "../../src/DataCache";
 
 export interface IProjectWithFetchProps {
   projectId: string;
@@ -17,8 +17,8 @@ export const ProjectWithFetch: React.SFC<IProjectWithFetchProps> = React.memo(
       fetch
     ]);
 
-    const dataStatus = useDataCacheWithFetch({
-      fetch: fetchProject,
+    const dataStatus = useResolver({
+      resolver: fetchProject,
       key: `GET Project ${projectId}`,
       suspend: suspend
     });
